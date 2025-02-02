@@ -39,7 +39,8 @@ class GitHubAPIService(CoreService):
                 return response.json()  # ✅ Successfully retrieved data
 
             elif (
-                response.status_code == 403 and "X-RateLimit-Remaining" in response.headers
+                response.status_code == 403
+                and "X-RateLimit-Remaining" in response.headers
             ):
                 # 🕒 Handle rate limits: wait for the reset time before retrying
                 reset_time = int(response.headers.get("X-RateLimit-Reset", time.time()))

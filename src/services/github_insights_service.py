@@ -24,8 +24,8 @@ class GitHubInsightsService:
     """
 
     def __init__(
-            self,
-            github_client_service: GitHubAPIService = Depends(),
+        self,
+        github_client_service: GitHubAPIService = Depends(),
     ):
         """
         Initializes the GitHubInsightsService.

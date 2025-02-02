@@ -32,7 +32,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
     MAX_FILES_PER_COMMIT = 5
 
     def __init__(
-            self,
+        self,
     ):
         """
         Initializes the metric with a predefined execution order and logger.
