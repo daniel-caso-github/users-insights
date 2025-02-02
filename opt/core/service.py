@@ -1,5 +1,7 @@
 import logging
-from src.config.settings import Settings  # Asegúrate de que esta clase esté bien definida en config/settings.py
+from src.config.settings import (
+    Settings,
+)  # Asegúrate de que esta clase esté bien definida en config/settings.py
 from opt.constans.order_service import OderService
 
 
@@ -19,9 +21,7 @@ class CoreService:
         logging.basicConfig(
             level=log_level,
             format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-            handlers=[
-                logging.StreamHandler()  # Logs printed to console
-            ]
+            handlers=[logging.StreamHandler()],  # Logs printed to console
         )
 
     @staticmethod
