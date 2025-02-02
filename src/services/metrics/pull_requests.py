@@ -1,7 +1,8 @@
 from collections import Counter
-from config.logger_config import get_logger
-from services.base_metric import BaseGitHubMetric
-from services.github_client import request_with_rate_limit
+
+from opt.constans.order_service import OderService
+from src.services.base_metric import BaseGitHubMetric
+from src.services.github_client_service import GitHubAPIService
 
 
 class RepositoriesWithMorePRs(BaseGitHubMetric):
@@ -17,7 +18,7 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
         logger (Logger): Logger instance for logging metric execution details.
 
     Methods:
-        get_data(username): Retrieves the top repositories where the user has submitted the most merged PRs.
+        execute(username): Retrieves the top repositories where the user has submitted the most merged PRs.
     """
 
     def __init__(self):
@@ -25,10 +26,11 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
         Initializes the metric with a predefined execution order and logger.
         """
         super().__init__()
-        self.order = 2
-        self.logger = get_logger(self.__class__.__name__)
+        self.order = OderService.repositories_with_more_prs.value
+        self.logger = self.get_logger(self.__class__.__name__)
+        self.github_client_service = GitHubAPIService()
 
-    def get_data(self, username):
+    def execute(self, username):
         """
         Retrieves the repositories where the user has submitted the most merged Pull Requests.
 
@@ -43,7 +45,7 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
         self.logger.info(f"📊 Starting PR repository analysis for {username}")
 
         path = f"/search/issues?q=author:{username}+type:pr+is:merged"
-        prs = request_with_rate_limit(path)
+        prs = self.github_client_service.request_with_rate_limit(path)
 
         if not prs or "items" not in prs:
             self.logger.warning(f"⚠️ No Pull Requests found for {username}")

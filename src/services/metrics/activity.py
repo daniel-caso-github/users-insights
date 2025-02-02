@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from config.logger_config import get_logger
-from services.base_metric import BaseGitHubMetric
-from services.github_client import request_with_rate_limit
+from opt.constans.order_service import OderService
+from src.services.base_metric import BaseGitHubMetric
+from src.services.github_client_service import GitHubAPIService
 
 
 class ActivityRecent(BaseGitHubMetric):
@@ -20,7 +20,7 @@ class ActivityRecent(BaseGitHubMetric):
         logger (Logger): Logger instance for logging metric execution details.
 
     Methods:
-        get_data(username): Retrieves and processes the user's contribution data.
+        execute(username): Retrieves and processes the user's contribution data.
     """
 
     def __init__(self):
@@ -28,10 +28,11 @@ class ActivityRecent(BaseGitHubMetric):
         Initializes the metric with a predefined execution order and logger.
         """
         super().__init__()
-        self.order = 3
-        self.logger = get_logger(self.__class__.__name__)
+        self.order = OderService.activity_recent.value
+        self.logger = self.get_logger(self.__class__.__name__)
+        self.github_client_service = GitHubAPIService()
 
-    def get_data(self, username):
+    def execute(self, username):
         """
         Retrieves and processes the user's contributions (pull requests, issues, commits)
         over the last six months.
@@ -101,7 +102,7 @@ class ActivityRecent(BaseGitHubMetric):
         start_date = f"{month}-01"
         end_date = self.get_last_day_of_month(month)
         path = f"/search/issues?q=author:{username}+type:pr+created:{start_date}..{end_date}"
-        data = request_with_rate_limit(path=path)
+        data = self.github_client_service.request_with_rate_limit(path=path)
 
         count = data.get("total_count", 0) if data else 0
         self.logger.info(f"📌 PRs fetched for {username} in {month}: {count}")
@@ -121,7 +122,7 @@ class ActivityRecent(BaseGitHubMetric):
         start_date = f"{month}-01"
         end_date = self.get_last_day_of_month(month)
         path = f"/search/issues?q=author:{username}+type:issue+created:{start_date}..{end_date}"
-        data = request_with_rate_limit(path=path)
+        data = self.github_client_service.request_with_rate_limit(path=path)
 
         count = data.get("total_count", 0) if data else 0
         self.logger.info(f"📌 Issues fetched for {username} in {month}: {count}")
@@ -138,7 +139,7 @@ class ActivityRecent(BaseGitHubMetric):
             list: A list of repository names where the user has made contributions.
         """
         path = f"/users/{username}/repos?per_page=100"
-        repos = request_with_rate_limit(path)
+        repos = self.github_client_service.request_with_rate_limit(path)
 
         if not repos:
             self.logger.warning(f"⚠️ No repositories found for {username}")
@@ -175,7 +176,7 @@ class ActivityRecent(BaseGitHubMetric):
         start_date = f"{month}-01T00:00:00Z"
         end_date = self.get_last_day_of_month(month) + "T23:59:59Z"
         path = f"/repos/{username}/{repo}/commits?author={username}&since={start_date}&until={end_date}"
-        commits = request_with_rate_limit(path=path)
+        commits = self.github_client_service.request_with_rate_limit(path=path)
 
         count = len(commits) if commits else 0
         self.logger.info(

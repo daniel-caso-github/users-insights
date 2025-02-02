@@ -1,6 +1,6 @@
-from config.logger_config import get_logger
-from services.base_metric import BaseGitHubMetric
-from services.github_client import request_with_rate_limit
+from opt.constans.order_service import OderService
+from src.services.base_metric import BaseGitHubMetric
+from src.services.github_client_service import GitHubAPIService
 
 
 class MostActiveHours(BaseGitHubMetric):
@@ -15,7 +15,7 @@ class MostActiveHours(BaseGitHubMetric):
         logger (Logger): Logger instance for logging metric execution details.
 
     Methods:
-        get_data(username): Retrieves and processes the user's activity data.
+        execute(username): Retrieves and processes the user's activity data.
     """
 
     def __init__(self):
@@ -23,10 +23,11 @@ class MostActiveHours(BaseGitHubMetric):
         Initializes the metric with a predefined execution order and logger.
         """
         super().__init__()
-        self.order = 4
-        self.logger = get_logger(self.__class__.__name__)
+        self.order = OderService.most_active_hours.value
+        self.logger = self.get_logger(self.__class__.__name__)
+        self.github_client_service = GitHubAPIService()
 
-    def get_data(self, username):
+    def execute(self, username):
         """
         Retrieves the user's activity from GitHub public events and categorizes it into time periods.
 
@@ -46,7 +47,7 @@ class MostActiveHours(BaseGitHubMetric):
         self.logger.info(f"📊 Starting hourly activity analysis for {username}")
 
         path = f"/users/{username}/events/public"
-        events = request_with_rate_limit(path=path)
+        events = self.github_client_service.request_with_rate_limit(path=path)
 
         # 🔹 Ensure the base structure always includes 0 values.
         activity_per_hour = {"morning": 0, "afternoon": 0, "evening": 0}

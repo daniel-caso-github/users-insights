@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from config.logger_config import get_logger
+from src.config.logger_config import get_logger
 
 logger = get_logger("API_ERRORS")
 

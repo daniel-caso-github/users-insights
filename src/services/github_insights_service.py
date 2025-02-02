@@ -1,10 +1,10 @@
 import importlib
 import pkgutil
 from pathlib import Path
-from fastapi import HTTPException
-from services.base_metric import BaseGitHubMetric
-from services.github_client import request_with_rate_limit
-from config.logger_config import get_logger
+from fastapi import HTTPException, Depends
+from src.services.base_metric import BaseGitHubMetric
+from src.config.logger_config import get_logger
+from src.services.github_client_service import GitHubAPIService
 
 
 class GitHubInsightsService:
@@ -23,7 +23,10 @@ class GitHubInsightsService:
     - Handles API errors gracefully to prevent unnecessary requests.
     """
 
-    def __init__(self):
+    def __init__(
+            self,
+            github_client_service: GitHubAPIService = Depends(),
+    ):
         """
         Initializes the GitHubInsightsService.
 
@@ -38,6 +41,7 @@ class GitHubInsightsService:
             [metric() for metric in BaseGitHubMetric.__subclasses__()],
             key=lambda m: m.order,
         )
+        self.github_client_service = github_client_service
 
         self.logger.info(
             f"🚀 Registered metrics (ordered): {[f'{m.__class__.__name__} (order={m.order})' for m in self.metrics]}"
@@ -69,7 +73,7 @@ class GitHubInsightsService:
             bool: True if the user exists, False otherwise.
         """
         path = f"/users/{username}"
-        response = request_with_rate_limit(path=path)
+        response = self.github_client_service.request_with_rate_limit(path=path)
 
         if not response or (
             "message" in response and response["message"] == "Not Found"
@@ -78,7 +82,7 @@ class GitHubInsightsService:
             return False
         return True
 
-    def get_data(self, username: str):
+    def execute(self, username: str):
         """
         Collects and returns analytics data for a given GitHub user.
 
@@ -109,7 +113,7 @@ class GitHubInsightsService:
                 self.logger.info(
                     f"🔍 Executing metric: {metric.__class__.__name__} (order={metric.order}) for {username}"
                 )
-                data = metric.get_data(username)
+                data = metric.execute(username)
 
                 if not data:
                     self.logger.warning(

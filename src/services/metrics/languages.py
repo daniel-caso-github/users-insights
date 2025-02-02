@@ -1,7 +1,8 @@
 from collections import Counter
-from config.logger_config import get_logger
-from services.base_metric import BaseGitHubMetric
-from services.github_client import request_with_rate_limit
+
+from opt.constans.order_service import OderService
+from src.services.base_metric import BaseGitHubMetric
+from src.services.github_client_service import GitHubAPIService
 
 
 class LanguagesMostUsed(BaseGitHubMetric):
@@ -20,7 +21,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
         logger (Logger): Logger instance for logging metric execution details.
 
     Methods:
-        get_data(username): Retrieves and processes the user's programming language usage.
+        execute(username): Retrieves and processes the user's programming language usage.
         get_repositories(username): Fetches a list of repositories owned by the user.
         get_commit_languages(username, repo): Retrieves the languages used in a specific repository.
         get_commit_files(username, repo, sha): Fetches the list of files modified in a commit.
@@ -30,15 +31,18 @@ class LanguagesMostUsed(BaseGitHubMetric):
     MAX_COMMITS_PER_REPO = 10
     MAX_FILES_PER_COMMIT = 5
 
-    def __init__(self):
+    def __init__(
+            self,
+    ):
         """
         Initializes the metric with a predefined execution order and logger.
         """
         super().__init__()
-        self.order = 1
-        self.logger = get_logger(self.__class__.__name__)
+        self.order = OderService.language_most_used.value
+        self.logger = self.get_logger(self.__class__.__name__)
+        self.github_client_service = GitHubAPIService()
 
-    def get_data(self, username):
+    def execute(self, username):
         """
         Retrieves and processes the most used programming languages based on the user's commits.
 
@@ -91,7 +95,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
         Limits the number of repositories fetched to 50 for performance optimization.
         """
         path = f"/users/{username}/repos?per_page=50"
-        repos = request_with_rate_limit(path)
+        repos = self.github_client_service.request_with_rate_limit(path)
 
         if not repos:
             self.logger.warning(f"⚠️ No repositories found for {username}")
@@ -119,7 +123,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
         Limits the number of commits analyzed per repository to MAX_COMMITS_PER_REPO.
         """
         path = f"/repos/{username}/{repo}/commits?author={username}&per_page={self.MAX_COMMITS_PER_REPO}"
-        commits = request_with_rate_limit(path)
+        commits = self.github_client_service.request_with_rate_limit(path)
 
         language_usage = Counter()
 
@@ -152,8 +156,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
 
         return language_usage
 
-    @staticmethod
-    def get_commit_files(username, repo, sha):
+    def get_commit_files(self, username, repo, sha):
         """
         Fetches the list of files modified in a commit.
 
@@ -166,7 +169,7 @@ class LanguagesMostUsed(BaseGitHubMetric):
             list: A list of filenames modified in the commit.
         """
         path = f"/repos/{username}/{repo}/commits/{sha}"
-        commit_data = request_with_rate_limit(path)
+        commit_data = self.github_client_service.request_with_rate_limit(path)
 
         if "files" not in commit_data:
             return []

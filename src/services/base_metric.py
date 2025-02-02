@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 
+from opt.constans.order_service import OderService
+from opt.core.service import CoreService
 
-class BaseGitHubMetric(ABC):
+
+class BaseGitHubMetric(ABC, CoreService):
     """
     Abstract base class for GitHub metrics.
 
@@ -13,7 +16,7 @@ class BaseGitHubMetric(ABC):
         order (int): Determines the execution order of metrics. Default is 100.
 
     Methods:
-        get_data(username): Abstract method that must be implemented by subclasses
+        execute(username): Abstract method that must be implemented by subclasses
                             to retrieve specific metric data.
         format_response(key, data): Formats the output response into a dictionary.
     """
@@ -25,10 +28,11 @@ class BaseGitHubMetric(ABC):
         The `order` attribute can be overridden in subclasses to determine
         the priority in which metrics are executed.
         """
-        self.order = 100
+        super().__init__()
+        self.order = OderService.default.value
 
     @abstractmethod
-    def get_data(self, username):
+    def execute(self, username):
         """
         Abstract method to be implemented by subclasses.
 

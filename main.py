@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends
 
-from schermas.github_insights import GitHubUserInsightsResponse
-from services.github_insights_service import GitHubInsightsService
+from opt.constans.tags import Tags
+from opt.schemas.github_insights import GitHubUserInsightsResponse
+from src.services.github_insights_service import GitHubInsightsService
 
 app = FastAPI(
     title="GitHub User Insights API",
@@ -27,6 +28,7 @@ app = FastAPI(
         404: {"description": "GitHub user not found"},
         500: {"description": "Internal server error"},
     },
+    tags=[Tags.users],
 )
 def get_insights_user(username: str, service: GitHubInsightsService = Depends()):
     """
@@ -39,4 +41,4 @@ def get_insights_user(username: str, service: GitHubInsightsService = Depends())
     Returns:
         GitHubUserInsightsResponse: A structured response with analytics data.
     """
-    return service.get_data(username)
+    return service.execute(username)
