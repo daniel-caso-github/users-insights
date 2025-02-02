@@ -10,6 +10,6 @@ class Settings:
 
     GITHUB_API_URL: str = os.getenv("GITHUB_API_URL", "https://api.github.com")
     GITHUB_TOKEN: str = os.getenv("GITHUB_TOKEN", "")
-    LOG_LEVEL: str = os.getenv(
-        "LOG_LEVEL", "INFO"
-    )  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    MAX_RESULTS_PER_PAGE = 100
+    MAX_PAGES = 5
