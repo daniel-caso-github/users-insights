@@ -1,5 +1,6 @@
 import importlib
 import pkgutil
+import time
 from pathlib import Path
 from fastapi import HTTPException, Depends
 from src.services.base_metric import BaseGitHubMetric
@@ -107,14 +108,19 @@ class GitHubInsightsService:
             )
 
         result = {}
+        total_start_time = time.time()
 
         for metric in self.metrics:
+            metric_start_time = time.time()
             try:
                 self.logger.info(
                     f"🔍 Executing metric: {metric.__class__.__name__} (order={metric.order}) for {username}"
                 )
                 data = metric.execute(username)
-
+                metric_execution_time = time.time() - metric_start_time
+                self.logger.info(
+                    f"✅ Metric {metric.__class__.__name__} executed in {metric_execution_time:.2f} seconds."
+                )
                 if not data:
                     self.logger.warning(
                         f"⚠️ Metric {metric.__class__.__name__} returned no data."
@@ -128,5 +134,8 @@ class GitHubInsightsService:
                     f"❌ Error executing {metric.__class__.__name__} for {username}: {e}"
                 )
 
+        total_execution_time = time.time() - total_start_time  # ⏳ Calculate total execution time
+
         self.logger.info(f"📊 Data collected for {username}: {result}")
+        self.logger.info(f"📊 Total execution time for {username}: {total_execution_time:.2f} seconds.")
         return result
