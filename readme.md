@@ -40,9 +40,29 @@ Create a .env file in the root directory and add the following:
 GITHUB_API_URL=https://api.github.com
 GITHUB_TOKEN=your_github_personal_access_token
 ```
+### ⚠️ Generate a GitHub Token
 
-### ⚠️ Make sure to replace your_github_personal_access_token with a valid GitHub token.
+To authenticate with the GitHub API, you need a **Personal Access Token (PAT)**. Follow these steps to generate one:
 
+1. **Visit the GitHub token generation page:**  
+   👉 [Generate a new personal access token](https://github.com/settings/personal-access-tokens/new)
+   
+2. **Under "Note",** give your token a meaningful name (e.g., `GitHub Insights API`).
+
+3. **Set an expiration date** as needed.
+
+4. **Under "Scopes (Permissions)", select the following:**
+
+   - ✅ **`repo`** → Full control of private repositories *(only if analyzing private repos)*
+   - ✅ **`read:user`** → Read access to user profile
+   - ✅ **`read:org`** → Read access to organization memberships
+   - ✅ **`public_repo`** → Access public repositories
+   - ✅ **`read:repo_hook`** → Read repository hooks *(optional)*
+   - ✅ **`read:packages`** → Read GitHub packages *(optional)*
+
+5. Click **"Generate token"**, then copy and store it securely.
+
+6. Replace `your_github_personal_access_token` in the `.env` file with your actual token.
 ### 🚀 Running the API
 Start the FastAPI application with:
 
@@ -105,28 +125,6 @@ For verbose test output:
 
 ```bash
 pytest -v
-```
-
-### 📂 Project Structure
-```
-github-insights-api/
-│── config/                    # Configuration files
-│   ├── logger_config.py        # Logger setup
-│── services/                   # API services
-│   ├── github_insights_service.py  # Main service handling GitHub insights
-│   ├── github_client.py        # GitHub API client for making requests
-│   ├── base_metric.py          # Base class for metrics
-│   ├── metrics/                # Folder containing different metrics
-│       ├── activity.py         # Monthly contribution metric
-│       ├── languages.py        # Most-used programming languages metric
-│       ├── active_hours.py     # Most active hours metric
-│       ├── repositories.py     # Repositories with most PRs metric
-│── tests/                      # Test suite
-│   ├── test_github_insights.py # Tests for API and services
-│── .env                        # Environment variables
-│── main.py                     # FastAPI application entry point
-│── requirements.txt             # Project dependencies
-│── README.md                    # Project documentation
 ```
 
 ### 🔍 Logging & Error Handling
