@@ -1,8 +1,7 @@
 from collections import Counter
-
-from opt.constans.order_service import OderService
 from src.services.base_metric import BaseGitHubMetric
 from src.services.github_client_service import GitHubAPIService
+from opt.constans.order_service import OderService
 
 
 class RepositoriesWithMorePRs(BaseGitHubMetric):
@@ -11,7 +10,7 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
     the most Pull Requests (PRs), focusing on merged PRs.
 
     This metric queries GitHub's search API to count the number of PRs the user
-    has authored across repositories.
+    has authored across repositories efficiently.
 
     Attributes:
         order (int): Defines the execution order of the metric (default: 2).
@@ -22,13 +21,12 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
     """
 
     def __init__(self):
-        """
-        Initializes the metric with a predefined execution order and logger.
-        """
         super().__init__()
         self.order = OderService.repositories_with_more_prs.value
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
+        self.max_results_per_page = self.get_setting("MAX_RESULTS_PER_PAGE")
+        self.max_pages = self.get_setting("MAX_PAGES")
 
     def execute(self, username):
         """
@@ -42,21 +40,36 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
 
         If no PRs are found, the response will contain an empty list.
         """
+
         self.logger.info(f"📊 Starting PR repository analysis for {username}")
 
-        path = f"/search/issues?q=author:{username}+type:pr+is:merged"
-        prs = self.github_client_service.request_with_rate_limit(path)
+        repos_counter = Counter()
+        page = 1
 
-        if not prs or "items" not in prs:
+        while page <= self.max_pages:
+            path = f"/search/issues?q=author:{username}+type:pr+is:merged&per_page={self.max_results_per_page}&page={page}"
+            response = self.github_client_service.request_with_rate_limit(path)
+
+            if not response or "items" not in response:
+                break
+
+            for pr in response["items"]:
+                repo_url = pr.get("repository_url")
+                if repo_url:
+                    repos_counter[repo_url] += 1
+
+            if len(response["items"]) < self.max_results_per_page:
+                break
+
+            page += 1
+
+        if not repos_counter:
             self.logger.warning(f"⚠️ No Pull Requests found for {username}")
-            return self.format_response(
-                "repos_with_more_prs", []
-            )  # Always return a list
+            return self.format_response("repos_with_more_prs", [])
 
-        # Count the occurrences of PRs per repository
-        repos = Counter(pr["repository_url"] for pr in prs["items"])
         formatted_repos = [
-            {"repository": repo, "count": count} for repo, count in repos.most_common(3)
+            {"repository": repo, "count": count}
+            for repo, count in repos_counter.most_common(3)
         ]
 
         self.logger.info(f"✅ Top PR repositories for {username}: {formatted_repos}")

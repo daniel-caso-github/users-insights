@@ -134,8 +134,12 @@ class GitHubInsightsService:
                     f"❌ Error executing {metric.__class__.__name__} for {username}: {e}"
                 )
 
-        total_execution_time = time.time() - total_start_time  # ⏳ Calculate total execution time
+        total_execution_time = (
+            time.time() - total_start_time
+        )
 
         self.logger.info(f"📊 Data collected for {username}: {result}")
-        self.logger.info(f"📊 Total execution time for {username}: {total_execution_time:.2f} seconds.")
+        self.logger.info(
+            f"📊 Total execution time for {username}: {total_execution_time:.2f} seconds."
+        )
         return result
