@@ -12,14 +12,14 @@ A FastAPI-based API that provides insights into GitHub users, including their mo
 
 ## 🛠️ Installation
 
-### 1️⃣ Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/github-insights-api.git
 cd github-insights-api
 ```
 
-### 2️⃣ Create a Virtual Environment
+### Create a Virtual Environment
 
 ```bash
 python -m venv venv
@@ -27,13 +27,13 @@ source venv/bin/activate   # On macOS/Linux
 venv\Scripts\activate      # On Windows
 ```
 
-### 3️⃣ Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements/requirements.txt
 ```
 
-### 4️⃣ Set Up Environment Variables
+### Set Up Environment Variables
 Create a .env file in the root directory and add the following:
 
 ```
@@ -52,17 +52,17 @@ To authenticate with the GitHub API, you need a **Personal Access Token (PAT)**.
 3. **Set an expiration date** as needed.
 
 4. **Under "Scopes (Permissions)", select the following:**
-
-   - ✅ **`repo`** → Full control of private repositories *(only if analyzing private repos)*
-   - ✅ **`read:user`** → Read access to user profile
-   - ✅ **`read:org`** → Read access to organization memberships
-   - ✅ **`public_repo`** → Access public repositories
-   - ✅ **`read:repo_hook`** → Read repository hooks *(optional)*
-   - ✅ **`read:packages`** → Read GitHub packages *(optional)*
+- ✅ **`repo`** → Full control of private repositories *(only if analyzing private repos)*
+- ✅ **`read:user`** → Read access to user profile
+- ✅ **`read:org`** → Read access to organization memberships
+- ✅ **`public_repo`** → Access public repositories
+- ✅ **`read:repo_hook`** → Read repository hooks *(optional)*
+- ✅ **`read:packages`** → Read GitHub packages *(optional)*
 
 5. Click **"Generate token"**, then copy and store it securely.
 
 6. Replace `your_github_personal_access_token` in the `.env` file with your actual token.
+
 ### 🚀 Running the API
 Start the FastAPI application with:
 
@@ -77,10 +77,8 @@ The API will be available at: http://127.0.0.1:8000
 Once the server is running, you can explore the API using interactive documentation:
 
 - 📄 **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- 📑 **Redoc UI**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
 ### 🔥 Available Endpoints
-### 🚀 User Insights
 ```
 GET /user-insights/{username}
 ```
