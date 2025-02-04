@@ -1,7 +1,7 @@
 import logging
 from src.config.settings import (
     Settings,
-)  # Asegúrate de que esta clase esté bien definida en config/settings.py
+)
 from opt.constans.order_service import OderService
 
 
