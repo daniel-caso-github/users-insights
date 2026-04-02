@@ -3,31 +3,20 @@ from src.config.settings import (
     Settings,
 )
 from opt.constans.order_service import OderService
+from src.config.logger_config import setup_logging, get_logger
 
 
 class CoreService:
     """Centralized service for handling settings and logging configuration."""
 
     def __init__(self):
-        """Initializes CoreService, loading settings and configuring logging."""
-        self.settings = Settings()  # Load settings from environment variables
-        self._configure_logging()
+        self.settings = Settings()
+        setup_logging(self.settings.LOG_LEVEL or "INFO")
         self.order = OderService
 
-    def _configure_logging(self):
-        """Configures logging settings globally."""
-        log_level = self.settings.LOG_LEVEL or "INFO"
-
-        logging.basicConfig(
-            level=log_level,
-            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-            handlers=[logging.StreamHandler()],  # Logs printed to console
-        )
-
     @staticmethod
-    def get_logger(name: str):
-        """Returns a logger instance for a given module/service."""
-        return logging.getLogger(name)
+    def get_logger(name: str) -> logging.Logger:
+        return get_logger(name)
 
     @staticmethod
     def get_header(token: str):

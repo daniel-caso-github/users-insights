@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 from main import app
 from src.services.github_client_service import GitHubAPIService
 from tests_mock.user_insights import mock_github_data
@@ -11,8 +11,8 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_github_requests():
-    with patch.object(GitHubAPIService, "request_with_rate_limit") as mock_request:
-        def mock_api_response(path):
+    with patch.object(GitHubAPIService, "request_with_rate_limit", new_callable=AsyncMock) as mock_request:
+        async def mock_api_response(path, client):
             path_parts = path.split("/")
             if "users" in path_parts and len(path_parts) > path_parts.index("users") + 1:
                 username = path_parts[path_parts.index("users") + 1]

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+import httpx
+
 from opt.constans.order_service import OderService
 from opt.core.service import CoreService
 
@@ -32,16 +34,7 @@ class BaseGitHubMetric(ABC, CoreService):
         self.order = OderService.default.value
 
     @abstractmethod
-    def execute(self, username):
-        """
-        Abstract method to be implemented by subclasses.
-
-        Args:
-            username (str): The GitHub username for which to retrieve metric data.
-
-        Returns:
-            dict: The formatted metric data.
-        """
+    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
         pass
 
     @staticmethod
