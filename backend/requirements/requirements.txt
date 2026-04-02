@@ -1,6 +1,0 @@
-fastapi
-uvicorn
-requests
-python-dotenv
-pytest
-requests-mock

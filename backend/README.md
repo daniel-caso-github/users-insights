@@ -5,11 +5,11 @@ REST API built with FastAPI that returns activity metrics for a GitHub user.
 ## Installation
 
 ```bash
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-venv\Scripts\activate         # Windows
+# Instalar dependencias (prod)
+uv sync
 
-pip install -r requirements/requirements.txt
+# Instalar incluyendo dev
+uv sync --group dev
 ```
 
 ## Environment variables
@@ -37,7 +37,7 @@ cp .env.example .env
 ## Run the API
 
 ```bash
-uvicorn main:app --reload
+uv run uvicorn main:app --reload
 ```
 
 - API: `http://localhost:8000`
@@ -82,10 +82,10 @@ GET /user-insights/{username}
 ## Tests
 
 ```bash
-pytest tests/
+uv run pytest tests/
 
 # With detailed output
-pytest tests/ -v
+uv run pytest tests/ -v
 ```
 
 ## Architecture
