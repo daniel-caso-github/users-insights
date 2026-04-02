@@ -1,0 +1,20 @@
+[project]
+name = "users-insights-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "requests",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "requests-mock",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
