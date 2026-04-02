@@ -178,3 +178,4 @@ frontend/dist/
 frontend/.env*.local
 /CLAUDE.md
 /.claude/
+/.clauderules
