@@ -14,7 +14,7 @@ class SummaryStatsMetric(BaseGitHubMetric):
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         profile_path = f"/users/{username}"
         prs_path = f"/search/issues?q=author:{username}+type:pr"
         merged_path = f"/search/issues?q=author:{username}+type:pr+is:merged"

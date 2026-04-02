@@ -15,10 +15,14 @@ class LanguagesMostUsed(BaseGitHubMetric):
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         self.logger.info(f"Starting language analysis for {username}")
 
-        repos = await self.get_repositories(username, client)
+        if repos is None:
+            repos = await self.get_repositories(username, client)
+        else:
+            repos = [repo["name"] for repo in repos if "name" in repo]
+
         if not repos:
             self.logger.warning(f"No repositories found for {username}")
             return self.format_response("most_used_languages", [])

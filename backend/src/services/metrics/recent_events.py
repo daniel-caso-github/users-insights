@@ -12,7 +12,7 @@ class RecentEventsMetric(BaseGitHubMetric):
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         path = f"/users/{username}/events/public?per_page=10"
         events = await self.github_client_service.request_with_rate_limit(path, client)
 

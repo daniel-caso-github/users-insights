@@ -62,8 +62,19 @@ class GitHubInsightsService(CoreService):
                     status_code=404, detail=f"User {username} not found on GitHub."
                 )
 
+            repos = await self.github_client_service.request_with_rate_limit(
+                f"/users/{username}/repos?per_page=100&type=owner&sort=updated", client
+            ) or []
+
+            async def _timed_metric(metric, username, client, repos):
+                start = time.time()
+                result = await metric.execute(username, client, repos=repos)
+                elapsed = time.time() - start
+                self.logger.info(f"[TIMING] {metric.__class__.__name__}: {elapsed:.2f}s")
+                return result
+
             results = await asyncio.gather(
-                *[metric.execute(username, client) for metric in self.metrics],
+                *[_timed_metric(metric, username, client, repos) for metric in self.metrics],
                 return_exceptions=True,
             )
 

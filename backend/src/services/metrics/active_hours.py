@@ -15,13 +15,13 @@ class MostActiveHours(BaseGitHubMetric):
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         self.logger.info(f"Starting hourly activity analysis for {username}")
 
         events, issues_prs, commits = await asyncio.gather(
             self.get_public_events(username, client),
             self.get_issues_and_prs(username, client),
-            self.get_recent_commits(username, client),
+            self.get_recent_commits(username, client, repos=repos),
         )
 
         all_events = events + issues_prs + commits
@@ -57,9 +57,10 @@ class MostActiveHours(BaseGitHubMetric):
 
         return [item["created_at"] for item in data["items"] if "created_at" in item]
 
-    async def get_recent_commits(self, username: str, client: httpx.AsyncClient):
-        path = f"/users/{username}/repos?per_page=10"
-        repos = await self.github_client_service.request_with_rate_limit(path, client)
+    async def get_recent_commits(self, username: str, client: httpx.AsyncClient, repos: list | None = None):
+        if repos is None:
+            path = f"/users/{username}/repos?per_page=10"
+            repos = await self.github_client_service.request_with_rate_limit(path, client)
 
         if not repos:
             self.logger.warning(f"No repositories found for {username}.")
