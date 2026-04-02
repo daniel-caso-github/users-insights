@@ -2,6 +2,31 @@ import random
 
 mock_github_data = {
     "torvalds": {
+        "name": "Linus Torvalds",
+        "bio": "Linux creator",
+        "company": None,
+        "location": "Portland, OR",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1024025",
+        "html_url": "https://github.com/torvalds",
+        "followers": 236000,
+        "following": 0,
+        "public_repos": 10,
+        "search_prs_total": {"total_count": 50},
+        "search_prs_merged": {"total_count": 40},
+        "events": [
+            {
+                "type": "PushEvent",
+                "repo": {"name": "torvalds/linux"},
+                "payload": {},
+                "created_at": "2025-01-01T10:00:00Z",
+            },
+            {
+                "type": "PullRequestEvent",
+                "repo": {"name": "torvalds/linux"},
+                "payload": {"action": "opened"},
+                "created_at": "2025-01-02T11:00:00Z",
+            },
+        ],
         "most_used_languages": [
             {"language": "Python", "count": random.randint(5000, 50000)},
             {"language": "JavaScript", "count": random.randint(1000, 20000)},
@@ -38,6 +63,25 @@ mock_github_data = {
         ],
     },
     "dhh": {
+        "name": "David Heinemeier Hansson",
+        "bio": "Rails creator",
+        "company": "37signals",
+        "location": "Malibu, CA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/2741",
+        "html_url": "https://github.com/dhh",
+        "followers": 15000,
+        "following": 50,
+        "public_repos": 25,
+        "search_prs_total": {"total_count": 120},
+        "search_prs_merged": {"total_count": 100},
+        "events": [
+            {
+                "type": "WatchEvent",
+                "repo": {"name": "rails/rails"},
+                "payload": {},
+                "created_at": "2025-01-03T09:00:00Z",
+            },
+        ],
         "most_used_languages": [
             {"language": "Go", "count": random.randint(5000, 30000)},
             {"language": "Kotlin", "count": random.randint(2000, 15000)},
@@ -67,6 +111,25 @@ mock_github_data = {
         ],
     },
     "tenderlove": {
+        "name": "Aaron Patterson",
+        "bio": "Ruby and Rails core",
+        "company": "Shopify",
+        "location": "Seattle, WA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3124",
+        "html_url": "https://github.com/tenderlove",
+        "followers": 8000,
+        "following": 200,
+        "public_repos": 80,
+        "search_prs_total": {"total_count": 300},
+        "search_prs_merged": {"total_count": 270},
+        "events": [
+            {
+                "type": "ForkEvent",
+                "repo": {"name": "ruby/ruby"},
+                "payload": {},
+                "created_at": "2025-01-04T14:00:00Z",
+            },
+        ],
         "most_used_languages": [
             {"language": "C#", "count": random.randint(3000, 20000)},
             {"language": "PHP", "count": random.randint(1000, 12000)},
@@ -97,6 +160,25 @@ mock_github_data = {
         ],
     },
     "mojombo": {
+        "name": "Tom Preston-Werner",
+        "bio": "GitHub co-founder",
+        "company": None,
+        "location": "San Francisco, CA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1",
+        "html_url": "https://github.com/mojombo",
+        "followers": 22000,
+        "following": 11,
+        "public_repos": 62,
+        "search_prs_total": {"total_count": 80},
+        "search_prs_merged": {"total_count": 60},
+        "events": [
+            {
+                "type": "CreateEvent",
+                "repo": {"name": "mojombo/grit"},
+                "payload": {"ref_type": "branch"},
+                "created_at": "2025-01-05T16:00:00Z",
+            },
+        ],
         "most_used_languages": [
             {"language": "Swift", "count": random.randint(2000, 10000)},
             {"language": "TypeScript", "count": random.randint(1000, 8000)},
