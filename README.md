@@ -1,13 +1,13 @@
 # GitHub User Insights
 
-Monorepo con una API REST (FastAPI) y una app web (React + Vite) para visualizar métricas de actividad de usuarios de GitHub.
+Monorepo with a REST API (FastAPI) and a web app (React + Vite) to visualize GitHub user activity metrics.
 
-## Estructura
+## Structure
 
 ```
 users-insights/
-├── backend/    ← API FastAPI
-└── frontend/   ← App React + Vite + TypeScript
+├── backend/    ← FastAPI API
+└── frontend/   ← React + Vite + TypeScript app
 ```
 
 ## Quick start
@@ -17,11 +17,11 @@ users-insights/
 ```bash
 cd backend
 pip install -r requirements/requirements.txt
-cp .env.example .env   # configurar GITHUB_TOKEN
+cp .env.example .env   # set GITHUB_TOKEN
 uvicorn main:app --reload
 ```
 
-API disponible en `http://localhost:8000` — docs en `http://localhost:8000/docs`.
+API available at `http://localhost:8000` — docs at `http://localhost:8000/docs`.
 
 ### Frontend
 
@@ -31,9 +31,9 @@ npm install
 npm run dev
 ```
 
-App disponible en `http://localhost:5173`.
+App available at `http://localhost:5173`.
 
-## Documentación
+## Documentation
 
-- [backend/README.md](backend/README.md) — instalación, variables de entorno, endpoint, tests y arquitectura
-- [frontend/README.md](frontend/README.md) — requisitos, scripts disponibles y build de producción
+- [Backend](backend/README.md) — installation, environment variables, endpoint, tests and architecture
+- [Frontend](frontend/README.md) — requirements, available scripts and production build
