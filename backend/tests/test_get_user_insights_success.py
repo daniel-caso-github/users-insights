@@ -6,6 +6,7 @@ from fastapi import status
 from unittest.mock import patch, AsyncMock
 from main import app
 from src.services.github_client_service import GitHubAPIService
+from src.services.github_graphql_service import GitHubGraphQLService
 from tests_mock.user_insights import mock_github_data
 
 client = TestClient(app)
@@ -13,7 +14,11 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_github_requests():
-    with patch.object(GitHubAPIService, "request_with_rate_limit", new_callable=AsyncMock) as mock_request:
+    with patch.object(GitHubGraphQLService, "query", new_callable=AsyncMock) as mock_graphql, \
+         patch.object(GitHubAPIService, "request_with_rate_limit", new_callable=AsyncMock) as mock_request:
+        mock_graphql.return_value = {
+            "user": {"contributionsCollection": {"totalCommitContributions": 42}}
+        }
         async def mock_api_response(path, client):
             if path.startswith("/search/issues"):
                 match = re.search(r"author:(\w+)", path)
@@ -32,6 +37,9 @@ def mock_github_requests():
 
                 if "events" in path_parts:
                     return user_data.get("events", [])
+
+                if "repos" in path_parts[-1]:
+                    return user_data.get("repos", [])
 
                 return user_data
 
