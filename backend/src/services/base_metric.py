@@ -34,7 +34,7 @@ class BaseGitHubMetric(ABC, CoreService):
         self.order = OderService.default.value
 
     @abstractmethod
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         pass
 
     @staticmethod
