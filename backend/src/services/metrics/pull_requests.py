@@ -1,4 +1,6 @@
+import asyncio
 from collections import Counter
+from math import ceil
 
 import httpx
 
@@ -16,28 +18,36 @@ class RepositoriesWithMorePRs(BaseGitHubMetric):
         self.max_results_per_page = self.get_setting("MAX_RESULTS_PER_PAGE")
         self.max_pages = self.get_setting("MAX_PAGES")
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         self.logger.info(f"Starting PR repository analysis for {username}")
 
+        base_path = f"/search/issues?q=author:{username}+type:pr+is:merged&per_page={self.max_results_per_page}"
+
+        first = await self.github_client_service.request_with_rate_limit(base_path + "&page=1", client)
+
+        if not first or "items" not in first:
+            self.logger.warning(f"No Pull Requests found for {username}")
+            return self.format_response("repos_with_more_prs", [])
+
+        total_count = first.get("total_count", 0)
+        remaining_pages = min(ceil(total_count / self.max_results_per_page), self.max_pages) - 1
+
+        all_items = list(first["items"])
+
+        if remaining_pages > 0:
+            rest = await asyncio.gather(*[
+                self.github_client_service.request_with_rate_limit(base_path + f"&page={p}", client)
+                for p in range(2, remaining_pages + 2)
+            ])
+            for r in rest:
+                if r and "items" in r:
+                    all_items.extend(r["items"])
+
         repos_counter = Counter()
-        page = 1
-
-        while page <= self.max_pages:
-            path = f"/search/issues?q=author:{username}+type:pr+is:merged&per_page={self.max_results_per_page}&page={page}"
-            response = await self.github_client_service.request_with_rate_limit(path, client)
-
-            if not response or "items" not in response:
-                break
-
-            for pr in response["items"]:
-                repo_url = pr.get("repository_url")
-                if repo_url:
-                    repos_counter[repo_url] += 1
-
-            if len(response["items"]) < self.max_results_per_page:
-                break
-
-            page += 1
+        for pr in all_items:
+            repo_url = pr.get("repository_url")
+            if repo_url:
+                repos_counter[repo_url] += 1
 
         if not repos_counter:
             self.logger.warning(f"No Pull Requests found for {username}")

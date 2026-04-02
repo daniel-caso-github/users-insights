@@ -17,7 +17,7 @@ class ActivityRecent(BaseGitHubMetric):
         self.max_results_per_page = self.get_setting("MAX_RESULTS_PER_PAGE")
         self.max_pages = self.get_setting("MAX_PAGES")
 
-    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+    async def execute(self, username: str, client: httpx.AsyncClient, repos: list | None = None) -> dict:
         today = datetime.today()
         months = [(today - timedelta(days=30 * i)).strftime("%Y-%m") for i in range(6)]
         contributions = {
@@ -28,7 +28,23 @@ class ActivityRecent(BaseGitHubMetric):
 
         await self.get_pr_issue_count(username, contributions, client)
 
-        repos = await self.get_repositories(username, client)
+        if repos is None:
+            repos = await self.get_repositories(username, client)
+        else:
+            six_months_ago = datetime.now() - timedelta(days=180)
+            filtered = []
+            for repo in repos:
+                pushed_at = repo.get("pushed_at")
+                if not pushed_at:
+                    continue
+                try:
+                    if datetime.strptime(pushed_at, "%Y-%m-%dT%H:%M:%SZ") >= six_months_ago:
+                        filtered.append(repo["name"])
+                except ValueError:
+                    pass
+            repos = filtered
+            self.logger.info(f"{len(repos)} active repos in last 6 months (pre-fetched)")
+
         if not repos:
             self.logger.warning(f"No repositories found for {username}")
             return self.format_response(
