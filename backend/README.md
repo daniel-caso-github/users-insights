@@ -1,8 +1,8 @@
 # Backend — GitHub User Insights API
 
-API REST construida con FastAPI que devuelve métricas de actividad de un usuario de GitHub.
+REST API built with FastAPI that returns activity metrics for a GitHub user.
 
-## Instalación
+## Installation
 
 ```bash
 python -m venv venv
@@ -12,29 +12,29 @@ venv\Scripts\activate         # Windows
 pip install -r requirements/requirements.txt
 ```
 
-## Variables de entorno
+## Environment variables
 
-Copiar `.env.example` a `.env`:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable              | Descripción                                      | Default                    |
-|-----------------------|--------------------------------------------------|----------------------------|
-| `GITHUB_TOKEN`        | Personal Access Token de GitHub (requerido)      | —                          |
-| `GITHUB_API_URL`      | Base URL de la API de GitHub                     | `https://api.github.com`   |
-| `MAX_RESULTS_PER_PAGE`| Resultados por página en paginación              | `100`                      |
-| `MAX_PAGES`           | Máximo de páginas a recorrer                     | `5`                        |
+| Variable               | Description                                      | Default                    |
+|------------------------|--------------------------------------------------|----------------------------|
+| `GITHUB_TOKEN`         | GitHub Personal Access Token (required)          | —                          |
+| `GITHUB_API_URL`       | GitHub API base URL                              | `https://api.github.com`   |
+| `MAX_RESULTS_PER_PAGE` | Results per page for pagination                  | `100`                      |
+| `MAX_PAGES`            | Maximum number of pages to traverse             | `5`                        |
 
-### Generar un GitHub Token
+### Generate a GitHub Token
 
-1. Ir a [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
-2. Asignar un nombre y fecha de expiración
-3. Seleccionar los scopes: `read:user`, `read:org`, `public_repo`
-4. Copiar el token generado en el `.env`
+1. Go to [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
+2. Set a name and expiration date
+3. Select scopes: `read:user`, `read:org`, `public_repo`
+4. Copy the generated token into `.env`
 
-## Ejecutar la API
+## Run the API
 
 ```bash
 uvicorn main:app --reload
@@ -49,7 +49,7 @@ uvicorn main:app --reload
 GET /user-insights/{username}
 ```
 
-### Respuesta exitosa (200)
+### Successful response (200)
 
 ```json
 {
@@ -71,34 +71,34 @@ GET /user-insights/{username}
 }
 ```
 
-### Códigos de respuesta
+### Response codes
 
-| Código | Descripción                   |
-|--------|-------------------------------|
-| 200    | Datos obtenidos correctamente |
-| 404    | Usuario de GitHub no encontrado |
-| 500    | Error interno del servidor    |
+| Code | Description                    |
+|------|--------------------------------|
+| 200  | Data retrieved successfully    |
+| 404  | GitHub user not found          |
+| 500  | Internal server error          |
 
 ## Tests
 
 ```bash
 pytest tests/
 
-# Con salida detallada
+# With detailed output
 pytest tests/ -v
 ```
 
-## Arquitectura
+## Architecture
 
 ```
 main.py (FastAPI router + DI)
     └─ GitHubInsightsService  (src/services/github_insights_service.py)
            ├─ GitHubAPIService  (src/services/github_client_service.py)
-           └─ Métricas (src/services/metrics/*.py)
+           └─ Metrics (src/services/metrics/*.py)
 ```
 
-### Patrón de métricas
+### Metrics pattern
 
-Cada métrica hereda de `BaseGitHubMetric` e implementa `execute(username) -> dict`. El orquestador las descubre dinámicamente con `pkgutil.iter_modules()` y las ejecuta según su atributo `order`.
+Each metric inherits from `BaseGitHubMetric` and implements `execute(username) -> dict`. The orchestrator discovers them dynamically via `pkgutil.iter_modules()` and runs them according to their `order` attribute.
 
-Para agregar una métrica nueva: crear un archivo en `src/services/metrics/` con una clase que herede de `BaseGitHubMetric`, defina `order: int` e implemente `execute`.
+To add a new metric: create a file in `src/services/metrics/` with a class that inherits from `BaseGitHubMetric`, defines `order: int` and implements `execute`.
