@@ -43,6 +43,18 @@ uv run uvicorn main:app --reload
 - API: `http://localhost:8000`
 - Swagger UI: `http://localhost:8000/docs`
 
+## Docker
+
+```bash
+# All services
+docker-compose up --build
+
+# Backend only
+docker-compose up --build backend
+```
+
+API available at `http://localhost:8000`.
+
 ## Endpoint
 
 ```
@@ -53,6 +65,17 @@ GET /user-insights/{username}
 
 ```json
 {
+  "user_profile": {
+    "name": "Jane Doe",
+    "bio": "Software engineer",
+    "company": "Acme Inc.",
+    "location": "Buenos Aires",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1",
+    "html_url": "https://github.com/janedoe",
+    "followers": 42,
+    "following": 10,
+    "public_repos": 15
+  },
   "most_used_languages": [
     {"language": "Python", "count": 10},
     {"language": "JavaScript", "count": 5}
@@ -67,6 +90,15 @@ GET /user-insights/{username}
     {"period": "morning", "count": 5},
     {"period": "afternoon", "count": 8},
     {"period": "evening", "count": 12}
+  ],
+  "summary_stats": {
+    "total_repos": 15,
+    "total_prs_merged": 47,
+    "merge_rate": 85
+  },
+  "recent_events": [
+    {"timestamp": "2025-02-10T14:23:00Z", "description": "Opened PR in user/repo1", "event_type": "PullRequestEvent"},
+    {"timestamp": "2025-02-09T09:00:00Z", "description": "Pushed to user/repo2", "event_type": "PushEvent"}
   ]
 }
 ```
