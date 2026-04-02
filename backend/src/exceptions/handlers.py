@@ -27,7 +27,7 @@ def add_exception_handlers(app: FastAPI):
         Returns:
             JSONResponse: A structured response with the appropriate status code.
         """
-        logger.error(f"❌ HTTP {exc.status_code}: {exc.detail} - {request.url}")
+        logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url}")
         return JSONResponse(
             status_code=exc.status_code,
             content={"error": exc.detail, "status_code": exc.status_code},
@@ -47,7 +47,7 @@ def add_exception_handlers(app: FastAPI):
         Returns:
             JSONResponse: A generic error response with status code 500.
         """
-        logger.critical(f"🚨 Unexpected error at {request.url}: {str(exc)}")
+        logger.critical(f"Unexpected error at {request.url}: {str(exc)}")
         return JSONResponse(
             status_code=500,
             content={"error": "Internal server error", "status_code": 500},

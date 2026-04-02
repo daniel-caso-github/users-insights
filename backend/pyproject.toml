@@ -5,7 +5,7 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi",
     "uvicorn",
-    "requests",
+    "httpx",
     "python-dotenv",
 ]
 
@@ -13,7 +13,6 @@ dependencies = [
 dev = [
     "pytest",
     "requests-mock",
-    "httpx",
 ]
 
 [tool.pytest.ini_options]

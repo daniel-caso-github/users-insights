@@ -1,4 +1,7 @@
+import asyncio
 from collections import Counter
+
+import httpx
 
 from opt.constans.order_service import OderService
 from src.services.base_metric import BaseGitHubMetric
@@ -6,96 +9,64 @@ from src.services.github_client_service import GitHubAPIService
 
 
 class LanguagesMostUsed(BaseGitHubMetric):
-    """
-    A GitHub metric that infers the most used programming languages
-    based on GitHub's language API and commit analysis.
-
-    Methods:
-        execute(username): Retrieves the user's most used languages.
-        get_repositories(username): Fetches a list of repositories the user contributed to.
-        get_languages_from_repo(username, repo): Uses GitHub's API to get language stats per repo.
-    """
-
     def __init__(self):
-        """Initializes the metric with a predefined execution order and logger."""
         super().__init__()
         self.order = OderService.language_most_used.value
         self.logger = self.get_logger(self.__class__.__name__)
         self.github_client_service = GitHubAPIService()
 
-    def execute(self, username):
-        """
-        Retrieves the most used programming languages by analyzing repository statistics.
-        """
-        self.logger.info(f"📊 Starting language analysis for {username}")
+    async def execute(self, username: str, client: httpx.AsyncClient) -> dict:
+        self.logger.info(f"Starting language analysis for {username}")
 
-        repos = self.get_repositories(username)
+        repos = await self.get_repositories(username, client)
         if not repos:
-            self.logger.warning(f"⚠️ No repositories found for {username}")
+            self.logger.warning(f"No repositories found for {username}")
             return self.format_response("most_used_languages", [])
 
-        language_counter = Counter()
+        language_results = await asyncio.gather(
+            *[self.get_languages_from_repo(username, repo, client) for repo in repos]
+        )
 
-        for repo in repos:
-            self.logger.info(f"🔍 Fetching language stats for repository: {repo}")
-            languages = self.get_languages_from_repo(username, repo)
-            language_counter.update(languages)
+        language_counter = Counter()
+        for result in language_results:
+            language_counter.update(result)
 
         most_used = [
             {"language": lang, "count": count}
             for lang, count in language_counter.most_common(3)
         ]
-        self.logger.info(f"✅ Top 3 languages for {username}: {most_used}")
+        self.logger.info(f"Top 3 languages for {username}: {most_used}")
 
         return self.format_response("most_used_languages", most_used)
 
-    def get_repositories(self, username):
-        """Fetches a list of repositories owned by the user."""
+    async def get_repositories(self, username: str, client: httpx.AsyncClient):
         path = f"/users/{username}/repos?per_page=50"
-        repos = self.github_client_service.request_with_rate_limit(path)
+        repos = await self.github_client_service.request_with_rate_limit(path, client)
 
         if not repos:
-            self.logger.warning(f"⚠️ No repositories found for {username}")
+            self.logger.warning(f"No repositories found for {username}")
             return []
 
         repo_names = [repo["name"] for repo in repos]
-        self.logger.info(
-            f"🔍 {len(repo_names)} repositories found for {username}: {repo_names}"
-        )
+        self.logger.info(f"{len(repo_names)} repos found for {username}")
 
         return repo_names
 
-    def get_languages_from_repo(self, username, repo):
-        """
-        Uses GitHub's built-in API to fetch language statistics for a repository.
-
-        Returns:
-            Counter: A counter object with language usage counts.
-        """
+    async def get_languages_from_repo(self, username: str, repo: str, client: httpx.AsyncClient):
         path = f"/repos/{username}/{repo}/languages"
-        data = self.github_client_service.request_with_rate_limit(path)
+        data = await self.github_client_service.request_with_rate_limit(path, client)
 
         if not data:
-            self.logger.warning(f"⚠️ No language data found for repository: {repo}")
+            self.logger.warning(f"No language data found for repository: {repo}")
             return Counter()
 
         language_usage = Counter(data)
-
-        self.logger.info(f"✅ Language stats for {repo}: {dict(language_usage)}")
+        self.logger.debug(f"Language stats for {repo}: {dict(language_usage)}")
 
         return language_usage
 
     @staticmethod
     def infer_language(filename):
-        """
-        Infers the programming language based on the file extension.
-
-        Args:
-            filename (str): The name of the file.
-
-        Returns:
-            str or None: The inferred programming language, or None if the extension is unknown.
-        """
         ext_to_lang = {
             ".py": "Python",
             ".pyw": "Python",
