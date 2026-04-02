@@ -11,8 +11,8 @@ mock_github_data = {
         "followers": 236000,
         "following": 0,
         "public_repos": 10,
-        "search_prs_total": {"total_count": 50},
-        "search_prs_merged": {"total_count": 40},
+        "search_prs_total": {"total_count": 50, "items": []},
+        "search_prs_merged": {"total_count": 40, "items": [{"repository_url": "https://api.github.com/repos/torvalds/linux"}, {"repository_url": "https://api.github.com/repos/torvalds/linux"}, {"repository_url": "https://api.github.com/repos/torvalds/subsurface-for-dirk"}]},
         "events": [
             {
                 "type": "PushEvent",
@@ -72,8 +72,8 @@ mock_github_data = {
         "followers": 15000,
         "following": 50,
         "public_repos": 25,
-        "search_prs_total": {"total_count": 120},
-        "search_prs_merged": {"total_count": 100},
+        "search_prs_total": {"total_count": 120, "items": []},
+        "search_prs_merged": {"total_count": 100, "items": [{"repository_url": "https://api.github.com/repos/dhh/rails"}]},
         "events": [
             {
                 "type": "WatchEvent",
@@ -120,8 +120,8 @@ mock_github_data = {
         "followers": 8000,
         "following": 200,
         "public_repos": 80,
-        "search_prs_total": {"total_count": 300},
-        "search_prs_merged": {"total_count": 270},
+        "search_prs_total": {"total_count": 300, "items": []},
+        "search_prs_merged": {"total_count": 270, "items": [{"repository_url": "https://api.github.com/repos/tenderlove/ruby"}]},
         "events": [
             {
                 "type": "ForkEvent",
@@ -169,8 +169,8 @@ mock_github_data = {
         "followers": 22000,
         "following": 11,
         "public_repos": 62,
-        "search_prs_total": {"total_count": 80},
-        "search_prs_merged": {"total_count": 60},
+        "search_prs_total": {"total_count": 80, "items": []},
+        "search_prs_merged": {"total_count": 60, "items": [{"repository_url": "https://api.github.com/repos/mojombo/grit"}]},
         "events": [
             {
                 "type": "CreateEvent",
